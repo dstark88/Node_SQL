@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
 
 var Connection = mysql.createConnection({
   host: "localhost",
@@ -14,12 +15,9 @@ Connection.connect(function(err) {
     ReadProducts();
 });
 
-var Table = require('cli-table');
- 
-// instantiate
 var table = new Table({
     head: ['Item ID', 'Product Name', 'Department', 'Price', 'Stock'],
-    colWidths: [10, 50, 20, 10, 10]
+    colWidths: [10, 40, 15, 15, 8]
 });
  
 function ReadProducts() {
@@ -42,6 +40,25 @@ function ReadProducts() {
     });
 }
 
+function continueShopping() {
+    inquirer
+    .prompt([
+        {
+            type: "confirm",
+            name: "confirm",
+            message: "What would you like to go back to continue shopping?",
+            default: true
+        }
+        ])
+        .then(function(answer) {
+            if (answer.confirm) {
+                ReadProducts();
+            } else {
+                console.log("\nThank you, come again!\n");
+            }
+        });
+}
+
 function runSelect(res) {
 inquirer
     .prompt([
@@ -51,7 +68,7 @@ inquirer
         message: "Please select an item number to purchase.",
         choices: [
             "1, Specalized S-Works Stumpjumper",
-            "2, Mclaren Senna", 
+            "2, Mclaren Senna GTR", 
             "3, Chateau Petrus Year 2010", 
             "4, Mosaic Table", 
             "5, Tag Heuer Monaco V4 Watch", 
@@ -98,23 +115,25 @@ inquirer
                 "UPDATE products SET ? WHERE ?",
                 [
                   {
-                    stock_quantity: chosenItem.stock_quantity-answer.quantity
+                    stock_quantity: chosenItem.stock_quantity - answer.quantity
                   },
                   {
                     item_id: chosenItem.item_id
                   }
                 ],
-                function(error) {
-                  if (error) throw error;
-                  console.log("\nCongratulations you purchased " + answer.quantity + " of the item #" + answer.itemId + ". Your total is $" + chosenItem.price + ".");
-                }                    
+                purchase(answer, chosenItem) 
               ); 
             } else {
                 console.log("Insufficient quantity!");
             } 
-        //   ReadProducts(); 
         } else {
             console.log("\nThat's okay, come again when you are ready to make a purchase.\n");
         }
     })
 }
+
+function purchase(answer, chosenItem) {
+    // if (error) throw error;
+    console.log("\nCongratulations you purchased " + answer.quantity + " of the item #" + answer.itemId + ". Your total is $" + chosenItem.price*answer.quantity + ".00.");
+    continueShopping();
+  }
