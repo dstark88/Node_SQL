@@ -284,7 +284,7 @@ function newProduct() {
           },
           function(err) {
             if (err) throw err;
-            console.log("Your have successfully added a new product to inventory.");
+            console.log("You have successfully added a new product to inventory.");
 
             mainMenu();
           }
