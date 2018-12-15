@@ -28,7 +28,7 @@ function ReadProducts() {
             var id = res[i].item_id;
             var product = res[i].product_name;
             var department = res[i].department_name;
-            var price = res[i].price;
+            var price = "$" + res[i].price;
             var stock = res[i].stock_quantity;
 
             table.push(
@@ -134,6 +134,6 @@ inquirer
 
 function purchase(answer, chosenItem) {
     // if (error) throw error;
-    console.log("\nCongratulations you purchased " + answer.quantity + " of the item #" + answer.itemId + ". Your total is $" + chosenItem.price*answer.quantity + ".00.");
+    console.log("\nCongratulations you purchased " + answer.quantity + " of the item #" + answer.itemId + ". Your total is $" + chosenItem.price*answer.quantity + ".");
     continueShopping();
   }

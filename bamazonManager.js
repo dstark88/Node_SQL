@@ -83,7 +83,7 @@ function ReadProducts() {
             var id = res[i].item_id;
             var product = res[i].product_name;
             var department = res[i].department_name;
-            var price = res[i].price;
+            var price = "$" + res[i].price;
             var stock = res[i].stock_quantity;
 
             table.push(
@@ -131,7 +131,7 @@ function lowInventory() {;
                     var id = res[i].item_id;
                     var product = res[i].product_name;
                     var department = res[i].department_name;
-                    var price = res[i].price;
+                    var price = "$" + res[i].price;
                     var stock = res[i].stock_quantity;
         
                     table.push(
@@ -217,8 +217,7 @@ function addInventory(res) {
                             console.log("\nYou have added " + answer.quantity + " of the item #" + answer.itemId + " to inventory");
                             mainMenu();
                         }                    
-                    ); 
-                  
+                    );  
             })
         }
     })
@@ -226,22 +225,69 @@ function addInventory(res) {
 
 function newProduct() {
     console.log("Add new products...\n");
-    Connection.query("INSERT INTO Products SET", function(err, res) {
-        if (err) throw err;
+    inquirer
+    .prompt([
         {
-        product_name: "Rocky Road"
-        department_name: ""
-        price: 3.0
-        quantity: 50
+        name: "itemId",
+        type: "input",
+        message: "Please enter the item ID.",
+        validate: function(value) {
+            if (isNaN(value) === false) {
+              return true;
+            }
+            return false;
+          }
+        },
+      {
+        name: "product",
+        type: "input",
+        message: "What is the new product you would like to add to inventory?"
+      },
+      {
+        name: "department",
+        type: "input",
+        message: "What is the department name?"
+      },
+      {
+        name: "price",
+        type: "input",
+        message: "What is the price of the product?",
+        validate: function(value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
         }
-        // function(err, res) {
-        console.log(res.affectedRows + " product added to inventory!\n");
-        // Call updateProduct AFTER the INSERT completes
-        ReadProduct();
+      },
+      {
+        name: "stock",
+        type: "input",
+        message: "How many would you like to add to inventory?",
+        validate: function(value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
         }
-    );
-    
-    // logs the actual query being run
-    console.log(query.sql);
-      
+      },
+    ])
+    .then(function(answer) {
+
+        Connection.query(
+          "INSERT INTO products SET ?",
+          {
+            item_id: answer.itemId,
+            product_name: answer.product,
+            department_name: answer.department,
+            price: answer.price,
+            stock_quantity: answer.stock
+          },
+          function(err) {
+            if (err) throw err;
+            console.log("Your have successfully added a new product to inventory.");
+
+            mainMenu();
+          }
+        );
+      });
 }
